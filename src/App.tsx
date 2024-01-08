@@ -50,15 +50,21 @@ const reducer = (state: Array<ITodo>, action: Action) => {
         return todo.id !== action.id;
       });
     case "ADD":
-      break;
+      return [...state,
+        {
+          id: crypto.randomUUID(),
+          title: action.title,
+          completed: false
+        }
+      ];
     default:
       return state;
   }
-  return state;
 };
 
 function App() {
   //const [todos, dispatch] = useState(initialToDos);
+  const input = useRef<HTMLInputElement>();
   const [todos, dispatch] = useReducer(reducer, initialToDos);
   const handleComplete = (id: string) => {
     dispatch({
@@ -72,16 +78,26 @@ function App() {
       id: id
     });
   };
+  const handleAdd = (title: string) => {
+    dispatch({
+      type: "ADD",
+      title: title
+    });
+  };
 
   return (
     <>
-      {todos.map((todo) => (
-        <div>
+      {todos.map((todo: ITodo) => (
+        <div key={todo.id}>
           <input type="checkbox" checked={todo.completed} onChange={() => {handleComplete(todo.id)}} />
           <span>{todo.title}</span>
           <button onClick={() => {handleDelete(todo.id)}}>Delete</button>
         </div>
       ))}
+      <div>
+        <input ref={input} />
+        <button onClick={() => {handleAdd(String(input?.current?.value))}}>Add</button>
+      </div>
     </>
   )
 }
